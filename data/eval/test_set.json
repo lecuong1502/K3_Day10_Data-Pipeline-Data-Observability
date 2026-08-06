@@ -1,0 +1,92 @@
+[
+  {
+    "id": "q1",
+    "question_type": "summary",
+    "question": "N\u1ed9i dung ch\u00ednh c\u1ee7a b\u00e0i b\u00e1o 'SafeRAG: A Large-Language-Model-Based Multistage Retrieval-Augmented Framework for Oil and Gas Safety Report Generation' \u0111\u1ec1 c\u1eadp \u0111\u1ebfn \u0111i\u1ec1u g\u00ec?",
+    "ground_truth": "Summary In high-risk industrial settings, leveraging large language models (LLMs) for automated accident analysis and generating safety reports has emerged as an efficient workflow.",
+    "ground_truth_doc_ids": [
+      "10.2118/234689-pa"
+    ]
+  },
+  {
+    "id": "q2",
+    "question_type": "authors",
+    "question": "T\u00e1c gi\u1ea3 c\u1ee7a b\u00e0i b\u00e1o 'Retrieval-Augmented Large-Language-Model-Based Time-Series Forecasting for Cross-Market Equity Analysis' l\u00e0 ai?",
+    "ground_truth": "Novanto Yudistira, Yanuar Putra Kharisma Adhiyasa",
+    "ground_truth_doc_ids": [
+      "10.21203/rs.3.rs-10178277/v1"
+    ]
+  },
+  {
+    "id": "q3",
+    "question_type": "date",
+    "question": "B\u00e0i b\u00e1o 'An Agentic AI System for Roof Design Compliance Using Computer Vision, Retrieval-Augmented Generation and Large Language Models' \u0111\u01b0\u1ee3c xu\u1ea5t b\u1ea3n v\u00e0o ng\u00e0y n\u00e0o?",
+    "ground_truth": "2026-07-02",
+    "ground_truth_doc_ids": [
+      "10.3390/buildings16132637"
+    ]
+  },
+  {
+    "id": "q4",
+    "question_type": "summary",
+    "question": "N\u1ed9i dung ch\u00ednh c\u1ee7a b\u00e0i b\u00e1o 'Hi\u2010 RAG : A Hierarchical Retrieval\u2010Augmented Generation Framework for Scalable and Generalisable Tool Selection in Large Language Model Agents' \u0111\u1ec1 c\u1eadp \u0111\u1ebfn \u0111i\u1ec1u g\u00ec?",
+    "ground_truth": "ABSTRACT As tool repositories for Large Language Model (LLM) agents grow from dozens to hundreds of endpoints, flat retrieval paradigms that treat the repository as an unstructured list suffer from context overload, cross\u2010domain semantic collision and degraded selection accuracy.",
+    "ground_truth_doc_ids": [
+      "10.1111/exsy.70341"
+    ]
+  },
+  {
+    "id": "q5",
+    "question_type": "summary",
+    "question": "N\u1ed9i dung ch\u00ednh c\u1ee7a b\u00e0i b\u00e1o 'Retrieval-Augmented Generation (RAG), Generative AI, and Agentic AI Governance: An Integrated Enterprise Governance Prioritization Architecture' \u0111\u1ec1 c\u1eadp \u0111\u1ebfn \u0111i\u1ec1u g\u00ec?",
+    "ground_truth": "Abstract Enterprise adoption of artificial intelligence (AI) systems, including Generative AI (GenAI), Retrieval-Augmented Generation (RAG), and agentic AI, is advancing faster than many organizations can adapt their governance, audit, cybersecurity, and executive oversight practices.",
+    "ground_truth_doc_ids": [
+      "10.21203/rs.3.rs-10012178/v1"
+    ]
+  },
+  {
+    "id": "q6",
+    "question_type": "authors",
+    "question": "T\u00e1c gi\u1ea3 c\u1ee7a b\u00e0i b\u00e1o 'Operationalizing Reliability Gaps in Large Language Models: A Semi-Systematic Evidence Map of Reasoning, Factuality, Evaluation, and Retrieval-Augmented Generation' l\u00e0 ai?",
+    "ground_truth": "Kushal Budha, Nikesh Lagun",
+    "ground_truth_doc_ids": [
+      "10.21203/rs.3.rs-9882260/v1"
+    ]
+  },
+  {
+    "id": "q7",
+    "question_type": "date",
+    "question": "B\u00e0i b\u00e1o 'Hallucination in Large Language Models and Retrieval-Augmented Generation: Mechanisms, Mitigation, and Evaluation' \u0111\u01b0\u1ee3c xu\u1ea5t b\u1ea3n v\u00e0o ng\u00e0y n\u00e0o?",
+    "ground_truth": "2026-06-01",
+    "ground_truth_doc_ids": [
+      "10.54254/2753-8818/2026.dl34055"
+    ]
+  },
+  {
+    "id": "q8",
+    "question_type": "summary",
+    "question": "N\u1ed9i dung ch\u00ednh c\u1ee7a b\u00e0i b\u00e1o 'Adapting Large Language Models for Low-Resource Regulated Domains: A Fine-Tuning and Retrieval-Augmented Generation Approach to Insurance Information Delivery in Kenya' \u0111\u1ec1 c\u1eadp \u0111\u1ebfn \u0111i\u1ec1u g\u00ec?",
+    "ground_truth": "Abstract Background.",
+    "ground_truth_doc_ids": [
+      "10.21203/rs.3.rs-9770645/v1"
+    ]
+  },
+  {
+    "id": "q9",
+    "question_type": "summary",
+    "question": "N\u1ed9i dung ch\u00ednh c\u1ee7a b\u00e0i b\u00e1o 'Speculative Retrieval-Augmented Generation for Cost-Efficient Large Language Model Inference' \u0111\u1ec1 c\u1eadp \u0111\u1ebfn \u0111i\u1ec1u g\u00ec?",
+    "ground_truth": "Abstract - This work focuses on the two crucial bottlenecks in Retrieval-Augmented Generation (RAG): high inference latency and expensive computation cost.",
+    "ground_truth_doc_ids": [
+      "10.55041/isjem07213"
+    ]
+  },
+  {
+    "id": "q10",
+    "question_type": "authors",
+    "question": "T\u00e1c gi\u1ea3 c\u1ee7a b\u00e0i b\u00e1o 'Retrieval-Augmented Large Language Model Agents for Automated Scientific Literature Review Generation' l\u00e0 ai?",
+    "ground_truth": "Ruotong Wang, Nyutian Long, Shunqi Liu, Yuxi Wang, Zhen Qi, Huajun Zhang",
+    "ground_truth_doc_ids": [
+      "10.20944/preprints202604.0339.v1"
+    ]
+  }
+]
