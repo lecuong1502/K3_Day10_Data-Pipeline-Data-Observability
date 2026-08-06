@@ -228,7 +228,7 @@
     "judge": {
       "score": 5,
       "correct": true,
-      "reasoning": "Both the model answer and the reference answer provide the same content, which is 'Abstract Background.' This indicates that the model answer is materially correct and accurately reflects the reference answer."
+      "reasoning": "The model answer accurately reflects the content of the reference answer, both stating 'Abstract Background', which indicates that it captures the main idea of the article as intended."
     }
   },
   {

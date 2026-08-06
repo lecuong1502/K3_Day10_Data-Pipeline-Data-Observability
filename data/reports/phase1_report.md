@@ -1,6 +1,6 @@
 # Phase 1 - Baseline Report
 
-Generated at: 2026-08-06T03:29:15.103410+00:00
+Generated at: 2026-08-06T03:49:47.523901+00:00
 
 ## Data Source
 
@@ -19,9 +19,9 @@ Generated at: 2026-08-06T03:29:15.103410+00:00
 | --- | --- |
 | `samples` | 10 |
 | `retrieval_hit_rate` | 1.0000 |
-| `mean_token_f1` | 0.5000 |
-| `judge_accuracy` | 0.5000 |
-| `mean_judge_score` | 3 |
+| `mean_token_f1` | 1.0000 |
+| `judge_accuracy` | 1.0000 |
+| `mean_judge_score` | 5 |
 
 **Ragas**
 

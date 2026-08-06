@@ -20,11 +20,30 @@ class AnswerResult:
 def _extract_answer(question: str, top_result: SearchResult) -> str:
     lowered = question.lower()
     metadata = top_result.metadata
-    if "who authored" in lowered or "list the authors" in lowered:
+
+    is_authors_question = (
+        "who authored" in lowered
+        or "list the authors" in lowered
+        or "tác giả" in lowered  # "Tác giả của bài báo ... là ai?"
+    )
+    is_date_question = (
+        "when was" in lowered
+        or "publication date" in lowered
+        or "published on" in lowered
+        or "xuất bản vào ngày nào" in lowered  # "... được xuất bản vào ngày nào?"
+        or "ngày nào" in lowered
+    )
+    is_categories_question = (
+        "what categories" in lowered
+        or "category" in lowered
+        or "lĩnh vực" in lowered  # "... thuộc (các) category/lĩnh vực nào?"
+    )
+
+    if is_authors_question:
         return metadata["authors_joined"]
-    if "when was" in lowered or "publication date" in lowered or "published on" in lowered:
+    if is_date_question:
         return metadata["published"]
-    if "what categories" in lowered:
+    if is_categories_question:
         return metadata["categories_joined"]
     return first_sentence(metadata["summary"])
 
