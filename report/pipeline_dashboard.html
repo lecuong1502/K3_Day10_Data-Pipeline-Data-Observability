@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 10 — Data Pipeline Control Room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a1210;
+    --panel:#101c19;
+    --panel-2:#0d1815;
+    --line:#1e332d;
+    --line-soft:#152420;
+    --text:#e7efec;
+    --muted:#7f9891;
+    --muted-2:#5a726b;
+    --cyan:#5fd0e0;
+    --cyan-dim:#1f4147;
+    --amber:#eaa73f;
+    --amber-dim:#4a3a1c;
+    --green:#57d6a0;
+    --green-dim:#1c3e30;
+    --red:#e8695f;
+    --red-dim:#432420;
+    --radius:10px;
+    --mono:'IBM Plex Mono', ui-monospace, monospace;
+    --sans:'IBM Plex Sans', system-ui, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 15% -10%, rgba(95,208,224,0.05), transparent 60%),
+      radial-gradient(1000px 500px at 90% 10%, rgba(87,214,160,0.04), transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    padding:32px 20px 80px;
+  }
+  .wrap{max-width:1080px;margin:0 auto;}
+
+  /* ---------- header ---------- */
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--muted);
+    display:flex;align-items:center;gap:8px;
+    margin-bottom:14px;
+  }
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);}
+  h1{
+    font-family:var(--mono);
+    font-weight:600;
+    font-size:clamp(26px,4vw,38px);
+    letter-spacing:-0.01em;
+    margin:0 0 10px;
+    color:#fff;
+  }
+  h1 span{color:var(--cyan);}
+  .lede{
+    color:var(--muted);
+    font-size:15px;
+    max-width:640px;
+    margin:0 0 40px;
+  }
+  .lede b{color:var(--text);font-weight:500;}
+
+  /* ---------- pipeline diagram ---------- */
+  .pipeline{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:26px 22px 22px;
+    margin-bottom:28px;
+    overflow-x:auto;
+  }
+  .pipeline-label{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--muted-2);
+    text-transform:uppercase;
+    letter-spacing:.12em;
+    margin-bottom:18px;
+  }
+  .flow{
+    display:flex;
+    align-items:stretch;
+    gap:0;
+    min-width:920px;
+  }
+  .node{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    padding:0 10px;
+    position:relative;
+  }
+  .node .n-icon{
+    width:34px;height:34px;
+    border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--mono);font-size:13px;font-weight:600;
+    background:var(--cyan-dim);color:var(--cyan);
+    border:1px solid var(--line);
+    transition:all .35s ease;
+  }
+  .node .n-title{font-family:var(--mono);font-size:12px;color:var(--text);font-weight:500;}
+  .node .n-sub{font-size:11px;color:var(--muted-2);line-height:1.35;min-height:28px;}
+  .connector{
+    flex:0 0 22px;
+    display:flex;align-items:center;justify-content:center;
+    padding-top:17px;
+  }
+  .connector svg{width:22px;height:10px;}
+  .connector path{stroke:var(--line);stroke-width:2;fill:none;stroke-dasharray:3 4;}
+  .flow.state-corrupted .node.affected .n-icon{
+    background:var(--amber-dim);color:var(--amber);
+    border-color:var(--amber);
+    box-shadow:0 0 0 3px rgba(234,167,63,0.08);
+  }
+  .flow.state-repaired .node.affected .n-icon{
+    background:var(--green-dim);color:var(--green);
+    border-color:var(--green);
+  }
+  .flow.state-corrupted .connector.affected path{stroke:var(--amber);stroke-dasharray:2 3;}
+  .flow.state-repaired .connector.affected path{stroke:var(--green);}
+
+  /* ---------- tabs ---------- */
+  .tabs{
+    display:flex;gap:8px;margin-bottom:22px;
+    border-bottom:1px solid var(--line);
+    padding-bottom:0;
+  }
+  .tab{
+    font-family:var(--mono);
+    font-size:12.5px;
+    padding:10px 16px;
+    background:none;
+    border:none;
+    color:var(--muted);
+    cursor:pointer;
+    position:relative;
+    letter-spacing:.02em;
+    display:flex;align-items:center;gap:7px;
+  }
+  .tab .sw{width:7px;height:7px;border-radius:50%;background:var(--muted-2);}
+  .tab[data-state="baseline"] .sw{background:var(--cyan);}
+  .tab[data-state="corrupted"] .sw{background:var(--amber);}
+  .tab[data-state="repaired"] .sw{background:var(--green);}
+  .tab.active{color:var(--text);}
+  .tab.active::after{
+    content:"";position:absolute;left:16px;right:16px;bottom:-1px;height:2px;
+  }
+  .tab[data-state="baseline"].active::after{background:var(--cyan);}
+  .tab[data-state="corrupted"].active::after{background:var(--amber);}
+  .tab[data-state="repaired"].active::after{background:var(--green);}
+
+  /* ---------- metric cards ---------- */
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px;}
+  @media (max-width:760px){.grid4{grid-template-columns:repeat(2,1fr);}}
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px 16px 14px;
+  }
+  .card .m-label{font-family:var(--mono);font-size:10.5px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;}
+  .card .m-value{font-family:var(--mono);font-size:26px;font-weight:600;color:#fff;display:flex;align-items:baseline;gap:8px;}
+  .card .m-delta{font-family:var(--mono);font-size:11px;padding:2px 6px;border-radius:5px;}
+  .m-delta.up{color:var(--green);background:var(--green-dim);}
+  .m-delta.down{color:var(--amber);background:var(--amber-dim);}
+  .m-delta.flat{color:var(--muted);background:var(--panel-2);}
+  .card .m-note{font-size:11.5px;color:var(--muted-2);margin-top:6px;line-height:1.4;}
+
+  /* ---------- quality row ---------- */
+  .section-title{
+    font-family:var(--mono);font-size:12px;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.1em;
+    margin:34px 0 12px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .section-title::after{content:"";flex:1;height:1px;background:var(--line);}
+
+  .qgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+  @media (max-width:760px){.qgrid{grid-template-columns:repeat(2,1fr);}}
+  .qcheck{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:12px;
+  }
+  .qcheck .q-name{font-family:var(--mono);font-size:11px;color:var(--text);margin-bottom:8px;}
+  .qcheck .q-badge{
+    display:inline-flex;align-items:center;gap:5px;
+    font-family:var(--mono);font-size:10.5px;font-weight:600;
+    padding:3px 7px;border-radius:5px;
+  }
+  .q-badge.pass{color:var(--green);background:var(--green-dim);}
+  .q-badge.fail{color:var(--red);background:var(--red-dim);}
+  .qcheck .q-detail{font-size:10.5px;color:var(--muted-2);margin-top:6px;line-height:1.4;}
+
+  /* ---------- corruption scenarios ---------- */
+  .sgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+  @media (max-width:760px){.sgrid{grid-template-columns:1fr;}}
+  .scard{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;
+  }
+  .scard .s-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .scard .s-name{font-family:var(--mono);font-size:13px;color:var(--amber);font-weight:600;}
+  .scard .s-count{font-family:var(--mono);font-size:11px;color:var(--muted-2);}
+  .scard .s-desc{font-size:12.5px;color:var(--muted);line-height:1.5;margin-bottom:10px;}
+  .scard .s-example{
+    font-family:var(--mono);font-size:11px;color:var(--muted-2);
+    background:var(--panel-2);border:1px solid var(--line-soft);border-radius:6px;
+    padding:8px 10px;
+  }
+  .scard .s-example b{color:var(--text);font-weight:500;}
+  .strike{text-decoration:line-through;color:var(--red);opacity:.7;}
+
+  /* ---------- causal chain ---------- */
+  .chain{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px 20px;margin-bottom:12px;
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  }
+  .chain .c-step{
+    font-family:var(--mono);font-size:12px;
+    padding:6px 12px;border-radius:20px;
+    background:var(--panel-2);border:1px solid var(--line);color:var(--text);
+  }
+  .chain .c-arrow{color:var(--muted-2);font-size:14px;}
+  .chain.repair .c-step.result{color:var(--green);border-color:var(--green-dim);background:var(--green-dim);}
+  .chain.corrupt .c-step.result{color:var(--amber);border-color:var(--amber-dim);background:var(--amber-dim);}
+
+  /* ---------- quiz ---------- */
+  .quiz-item{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px 18px;margin-bottom:10px;cursor:pointer;
+    transition:border-color .2s ease;
+  }
+  .quiz-item:hover{border-color:var(--cyan-dim);}
+  .quiz-q{font-size:13.5px;color:var(--text);display:flex;justify-content:space-between;align-items:center;gap:12px;}
+  .quiz-q .qmark{font-family:var(--mono);color:var(--cyan);flex-shrink:0;}
+  .quiz-a{
+    max-height:0;overflow:hidden;
+    font-size:12.5px;color:var(--muted);line-height:1.6;
+    transition:max-height .3s ease, margin-top .3s ease;
+  }
+  .quiz-item.open .quiz-a{max-height:260px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);}
+  .quiz-item .toggle{font-family:var(--mono);font-size:11px;color:var(--muted-2);}
+
+  footer{
+    margin-top:50px;padding-top:20px;border-top:1px solid var(--line);
+    font-family:var(--mono);font-size:11px;color:var(--muted-2);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow"><span class="dot"></span>K3 · CƯỜNG ĐỘ ĐỨC TRÍ · DATA PIPELINE &amp; OBSERVABILITY</div>
+  <h1>Baseline <span>→</span> Corrupted <span>→</span> Repaired</h1>
+  <p class="lede">Phòng điều khiển của pipeline RAG lấy dữ liệu từ <b>Crossref</b>, làm sạch, index vào <b>ChromaDB</b> (embedding <b>bge-m3:567m</b>), rồi cố tình phá hỏng và phục hồi để đo bằng số liệu — không phải bằng lời — dữ liệu hỏng ảnh hưởng thế nào đến agent.</p>
+
+  <div class="pipeline">
+    <div class="pipeline-label">Luồng end-to-end</div>
+    <div class="flow" id="flow">
+      <div class="node"><div class="n-icon">01</div><div class="n-title">Crossref API</div><div class="n-sub">24 bài báo, retry 429/503</div></div>
+      <div class="connector"><svg viewBox="0 0 22 10"><path d="M0 5 H22"/></svg></div>
+      <div class="node"><div class="n-icon">02</div><div class="n-title">Clean</div><div class="n-sub">strip tag, drop &lt;100 ký tự</div></div>
+      <div class="connector"><svg viewBox="0 0 22 10"><path d="M0 5 H22"/></svg></div>
+      <div class="node affected"><div class="n-icon">03</div><div class="n-title">Embed + Chroma</div><div class="n-sub">bge-m3:567m, top_k=4</div></div>
+      <div class="connector affected"><svg viewBox="0 0 22 10"><path d="M0 5 H22"/></svg></div>
+      <div class="node affected"><div class="n-icon">04</div><div class="n-title">Evaluate</div><div class="n-sub">10 câu hỏi đóng băng</div></div>
+      <div class="connector affected"><svg viewBox="0 0 22 10"><path d="M0 5 H22"/></svg></div>
+      <div class="node affected"><div class="n-icon">05</div><div class="n-title">Quality/Freshness</div><div class="n-sub">5 check tĩnh + thời gian</div></div>
+      <div class="connector affected"><svg viewBox="0 0 22 10"><path d="M0 5 H22"/></svg></div>
+      <div class="node"><div class="n-icon">06</div><div class="n-title">Report</div><div class="n-sub">markdown so sánh 3 cột</div></div>
+    </div>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-state="baseline"><span class="sw"></span>baseline</button>
+    <button class="tab" data-state="corrupted"><span class="sw"></span>corrupted</button>
+    <button class="tab" data-state="repaired"><span class="sw"></span>repaired</button>
+  </div>
+
+  <div class="grid4" id="metrics"></div>
+
+  <div class="section-title">Data quality &amp; freshness</div>
+  <div class="qgrid" id="quality"></div>
+
+  <div class="section-title">Chuỗi nhân–quả</div>
+  <div id="chains"></div>
+
+  <div class="section-title">4 kịch bản corruption (ép overlap 100% với frozen test set)</div>
+  <div class="sgrid">
+    <div class="scard">
+      <div class="s-head"><span class="s-name">blank_summary</span><span class="s-count">10 paper (+2 duplicate)</span></div>
+      <div class="s-desc">Xoá <code>summary</code> của toàn bộ 10 paper nằm trong <code>ground_truth_doc_ids</code> của test set — ảnh hưởng trực tiếp câu hỏi loại <b>summary</b>.</div>
+      <div class="s-example"><b>10.2118/234689-pa</b> — "Summary In high-risk industrial..." → <span class="strike">rỗng</span></div>
+    </div>
+    <div class="scard">
+      <div class="s-head"><span class="s-name">noise_injection</span><span class="s-count">10 paper (cùng nhóm)</span></div>
+      <div class="s-desc">Chèn token rác vào <code>title</code>, rebuild <code>text_for_embedding</code> — nhắm vào embedding, không phải schema.</div>
+      <div class="s-example"><b>10.1111/exsy.70341</b> — "Hi-RAG..." → "Hi-RAG... zzz-noise-zzz %%%CORRUPTED%%%"</div>
+    </div>
+    <div class="scard">
+      <div class="s-head"><span class="s-name">stale_date</span><span class="s-count">3 paper (ngoài target)</span></div>
+      <div class="s-desc">Ép <code>published</code> về năm 2000 — độc lập với kích thước test set, luôn kích hoạt freshness FAIL.</div>
+      <div class="s-example">10.32473/flairs.39.1.141782 — 2026-05-06 → <span class="strike">2000-01-01</span></div>
+    </div>
+    <div class="scard">
+      <div class="s-head"><span class="s-name">duplicate_row</span><span class="s-count">2 paper nhân đôi</span></div>
+      <div class="s-desc">Nhân đôi 2 bản ghi cùng <code>paper_id</code> — vi phạm uniqueness, 24 → 26 dòng.</div>
+      <div class="s-example">10.21203/rs.3.rs-10012178/v1 — 1 copy → 2 copies</div>
+    </div>
+  </div>
+
+  <div class="section-title">Hiểu luồng — tự kiểm tra nhanh</div>
+  <div id="quiz"></div>
+
+  <footer>
+    <span>data/reports/corruption_report.md · 2026-08-06T03:51:01Z</span>
+    <span>bge-m3:567m via Ollama · openrouter/openai-gpt-4o-mini judge</span>
+  </footer>
+</div>
+
+<script>
+const STATES = {
+  baseline: {
+    metrics: [
+      {label:'retrieval_hit_rate', value:'1.0000', delta:null, note:'10/10 câu hỏi retriever trả đúng paper_id trong top-4.'},
+      {label:'mean_token_f1', value:'1.0000', delta:null, note:'Ground truth lấy trực tiếp từ field dữ liệu → khớp tuyệt đối là kỳ vọng đúng.'},
+      {label:'judge_accuracy', value:'1.0000', delta:null, note:'LLM judge (gpt-4o-mini) chấm đúng cả 10 câu.'},
+      {label:'mean_judge_score', value:'5.0', delta:null, note:'Điểm tuyệt đối thang 1–5.'},
+    ],
+    quality: [
+      {name:'row_count', pass:true, detail:'24 dòng'},
+      {name:'paper_id unique', pass:true, detail:'0 duplicate'},
+      {name:'title not null', pass:true, detail:'0 null'},
+      {name:'summary ≥100 ký tự', pass:true, detail:'0 too-short'},
+      {name:'freshness ≤180d', pass:true, detail:'0 stale, latest 2026-08-01'},
+    ],
+  },
+  corrupted: {
+    metrics: [
+      {label:'retrieval_hit_rate', value:'1.0000', delta:'0 · flat', note:'Corpus 26 tài liệu + top_k=4 khoan dung với noise nhẹ ở title.'},
+      {label:'mean_token_f1', value:'0.5000', delta:'-0.5 · down', note:'Câu hỏi loại summary trúng 10 paper bị blank_summary → trả lời rỗng.'},
+      {label:'judge_accuracy', value:'0.9000', delta:'-0.1 · down', note:'1/10 câu bị chấm sai do answer rỗng.'},
+      {label:'mean_judge_score', value:'4.5', delta:'-0.5 · down', note:'Nhất quán với judge_accuracy.'},
+    ],
+    quality: [
+      {name:'row_count', pass:true, detail:'26 dòng (+2 duplicate)'},
+      {name:'paper_id unique', pass:false, detail:'duplicate_count=2'},
+      {name:'title not null', pass:true, detail:'0 null (vẫn có nội dung, chỉ bị noise)'},
+      {name:'summary ≥100 ký tự', pass:false, detail:'too_short_count=12'},
+      {name:'freshness ≤180d', pass:false, detail:'stale_rows=3, oldest 2000-01-01'},
+    ],
+  },
+  repaired: {
+    metrics: [
+      {label:'retrieval_hit_rate', value:'1.0000', delta:'100% · up', note:'Khôi phục đúng bằng baseline.'},
+      {label:'mean_token_f1', value:'1.0000', delta:'100% · up', note:'Rebuild từ crossref_records.json gốc, không fetch lại API.'},
+      {label:'judge_accuracy', value:'1.0000', delta:'100% · up', note:'Khôi phục đúng bằng baseline.'},
+      {label:'mean_judge_score', value:'5.0', delta:'100% · up', note:'Khôi phục đúng bằng baseline.'},
+    ],
+    quality: [
+      {name:'row_count', pass:true, detail:'24 dòng'},
+      {name:'paper_id unique', pass:true, detail:'0 duplicate'},
+      {name:'title not null', pass:true, detail:'0 null'},
+      {name:'summary ≥100 ký tự', pass:true, detail:'0 too-short'},
+      {name:'freshness ≤180d', pass:true, detail:'0 stale, latest 2026-08-01'},
+    ],
+  }
+};
+
+const CHAINS = {
+  baseline: `<div class="chain"><span class="c-step">Dữ liệu sạch</span><span class="c-arrow">→</span><span class="c-step">Quality/Freshness PASS</span><span class="c-arrow">→</span><span class="c-step result">RAG metrics = 1.0 (mốc đối chứng)</span></div>`,
+  corrupted: `<div class="chain corrupt"><span class="c-step">blank_summary (10 target)</span><span class="c-arrow">→</span><span class="c-step">summary_min_length FAIL</span><span class="c-arrow">→</span><span class="c-step result">mean_token_f1 1.0 → 0.5</span></div>`,
+  repaired: `<div class="chain repair"><span class="c-step">Rebuild từ raw snapshot</span><span class="c-arrow">→</span><span class="c-step">Quality/Freshness PASS trở lại</span><span class="c-arrow">→</span><span class="c-step result">RAG metrics phục hồi 100%</span></div>`
+};
+
+const QUIZ = [
+  {
+    q: "Vì sao retrieval_hit_rate không đổi (vẫn 1.0) dù dữ liệu đã bị corrupt?",
+    a: "Corpus chỉ 24–26 tài liệu và top_k=4 khá khoan dung — vài token rác chèn vào title (noise_injection) chưa đủ mạnh để đẩy tài liệu đúng ra khỏi top-4 kết quả. Đây là giới hạn của quy mô thử nghiệm, không phải corruption vô hại."
+  },
+  {
+    q: "Vì sao repair phải dựng lại từ raw snapshot thay vì gọi lại Crossref API?",
+    a: "Raw response đã lưu là 'nguồn sự thật' chưa từng bị corruption chạm vào. Gọi lại API có thể trả về tập kết quả khác (rate limit, index thay đổi), phá vỡ giả định repaired ≈ baseline cần thiết để so sánh công bằng."
+  },
+  {
+    q: "Vì sao phải dùng đúng 1 bộ test set (đóng băng) cho cả 3 trạng thái?",
+    a: "Để cô lập một biến độc lập duy nhất: trạng thái dữ liệu. Nếu câu hỏi đổi giữa các lần đánh giá, chênh lệch metrics có thể đến từ độ khó câu hỏi khác nhau, không phải từ việc dữ liệu bị hỏng."
+  },
+  {
+    q: "Vì sao mean_token_f1 giảm đúng 0.5 chứ không giảm về 0?",
+    a: "Chỉ câu hỏi loại 'summary' nhắm vào 10 paper bị blank_summary mới trả lời rỗng. Câu hỏi authors/date/categories vẫn dùng metadata (authors_joined, published, categories_joined) — phần lớn không bị chạm tới — nên vẫn đúng."
+  }
+];
+
+function renderMetrics(state){
+  const el = document.getElementById('metrics');
+  el.innerHTML = STATES[state].metrics.map(m => {
+    const [dv, dc] = m.delta ? m.delta.split(' · ') : [null,null];
+    return `<div class="card">
+      <div class="m-label">${m.label}</div>
+      <div class="m-value">${m.value}${dv ? `<span class="m-delta ${dc}">${dv}</span>` : ''}</div>
+      <div class="m-note">${m.note}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderQuality(state){
+  const el = document.getElementById('quality');
+  el.innerHTML = STATES[state].quality.map(q => `
+    <div class="qcheck">
+      <div class="q-name">${q.name}</div>
+      <span class="q-badge ${q.pass?'pass':'fail'}">${q.pass?'✓ PASS':'✕ FAIL'}</span>
+      <div class="q-detail">${q.detail}</div>
+    </div>
+  `).join('');
+}
+
+function renderChain(state){
+  document.getElementById('chains').innerHTML = CHAINS[state];
+}
+
+function renderFlow(state){
+  const flow = document.getElementById('flow');
+  flow.className = 'flow state-' + state;
+}
+
+function setState(state){
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.state === state));
+  renderMetrics(state);
+  renderQuality(state);
+  renderChain(state);
+  renderFlow(state);
+}
+
+document.getElementById('tabs').addEventListener('click', e => {
+  const btn = e.target.closest('.tab');
+  if(!btn) return;
+  setState(btn.dataset.state);
+});
+
+// quiz
+const quizEl = document.getElementById('quiz');
+quizEl.innerHTML = QUIZ.map((item, i) => `
+  <div class="quiz-item" data-i="${i}">
+    <div class="quiz-q"><span><span class="qmark">Q${i+1}·</span> ${item.q}</span><span class="toggle">xem đáp án</span></div>
+    <div class="quiz-a">${item.a}</div>
+  </div>
+`).join('');
+quizEl.addEventListener('click', e => {
+  const item = e.target.closest('.quiz-item');
+  if(!item) return;
+  item.classList.toggle('open');
+});
+
+setState('baseline');
+</script>
+</body>
+</html>
